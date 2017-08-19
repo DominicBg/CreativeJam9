@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour {
 
 	public float knockbackMagnitude = 2;
 	public int damage = 10;
-
+	public float slideFactor;
 	private Vector3 slideVector;
 
 	//Buttons
@@ -63,7 +63,21 @@ public class PlayerController : MonoBehaviour {
 		if(moveVector.magnitude > 1)
 			moveVector.Normalize();
 
-		tr.position += moveVector * moveSpeed * Time.deltaTime;
+
+		if(moveVector.magnitude == 0)
+		{		
+			slideVector *= slideFactor;
+		}
+		else
+		{
+			slideVector += moveVector * slideFactor;
+			if(slideVector.magnitude > 1)
+				slideVector.Normalize();
+		}
+
+		tr.position += (moveVector + slideVector) * moveSpeed * Time.deltaTime;
+
+	
 	}
 	void InputAim()
 	{
