@@ -99,9 +99,13 @@
      <Compile Include="Assets\Rewired\Internal\Scripts\InputManager.cs" />
      <Compile Include="Assets\Rewired\Internal\Scripts\Misc\ExternalTools.cs" />
      <Compile Include="Assets\Rewired\Internal\Scripts\Platforms\Ouya\OuyaInputSource.cs" />
+     <Compile Include="Assets\Scripts\Libraries\GameEffect.cs" />
+     <Compile Include="Assets\Scripts\Libraries\Vector234Extensions.cs" />
      <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
      <Compile Include="Assets\Scripts\Players\Bullet.cs" />
      <Compile Include="Assets\Scripts\Players\PlayerController.cs" />
+     <Compile Include="Assets\Scripts\Props\Water.cs" />
      <None Include="Assets\Rewired\Extras\TouchControls\Shaders\ColorShift.shader" />
      <None Include="Assets\Rewired\Documentation\licences.txt" />
      <None Include="Assets\Rewired\Documentation\ReadMe.txt" />
