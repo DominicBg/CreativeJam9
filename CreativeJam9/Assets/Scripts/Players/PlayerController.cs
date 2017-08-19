@@ -11,23 +11,38 @@ public class PlayerController : MonoBehaviour {
 
 	[Header("Component")]
 	Transform tr;
+	Rigidbody rb;
 	[SerializeField] Transform baseTr;
 	[SerializeField] Transform cannonShootPosition;
 
 	[SerializeField] GameObject bulletPrefab;
+	[SerializeField] GameObject waterPrefab;
 
 	[Header("Stats")]
+	public int waterLevel = 100; //HP
 	public float moveSpeed;
 	public float rotationSpeed;
 	public float bulletSpeed;
 	public float cooldownShoot = 0.5f;
+	public float cooldownDash = 0.5f;
 
+	public float knockbackMagnitude = 2;
+	public int damage = 10;
 
-	private bool shootCooldown; 
+	private Vector3 slideVector;
+
+	//Buttons
+	private Vector3 shootDir;
+	private bool onShootCooldown; 
 	private bool releasedShootTrigger = true;
+
+	private Vector3 dashDir;
+	private bool onDashCooldown; 
+	private bool releasedDashTrigger = true;
 
 	void Start () 
 	{
+		rb = GetComponent<Rigidbody>(); 
 		tr = GetComponent<Transform>();
 		player = ReInput.players.GetPlayer(playerID);
 	}
@@ -36,7 +51,9 @@ public class PlayerController : MonoBehaviour {
 	{
 		InputMouvement();
 		InputAim();
+		RotateBase();
 		InputShoot();
+		InputDash();
 	}
 
 	void InputMouvement()
@@ -52,21 +69,24 @@ public class PlayerController : MonoBehaviour {
 	{
 		Vector3 aimVector = new Vector3(player.GetAxis("AimX"),0,player.GetAxis("AimY"));
 
-		if(aimVector.magnitude == 0)
+		if(aimVector.magnitude < .3)
 			return;
 
 		aimVector.Normalize();
+		shootDir = aimVector;
+	}
+	void RotateBase()
+	{
 		float step = rotationSpeed * Time.deltaTime;
-
-		Vector3 newDir = Vector3.RotateTowards(baseTr.forward, aimVector, step, 0.0f);
-
+		Vector3 newDir = Vector3.RotateTowards(baseTr.forward, shootDir, step, 0.0f);
 		baseTr.rotation = Quaternion.LookRotation(newDir);
 	}
+	#region Shoot
 	void InputShoot()
 	{
 		if(player.GetAxis("Shoot") > .5f)
 		{
-			if(!shootCooldown && releasedShootTrigger)
+			if(!onShootCooldown && releasedShootTrigger)
 			{
 				ShootBullet();
 				StartCoroutine(CooldownShoot());
@@ -79,14 +99,86 @@ public class PlayerController : MonoBehaviour {
 	}
 	IEnumerator CooldownShoot()
 	{
-		shootCooldown = true;
+		onShootCooldown = true;
 		yield return new WaitForSeconds(cooldownShoot);
-		shootCooldown = false;
+		onShootCooldown = false;
 	}
+	void InputDash()
+	{
+		if(player.GetAxis("Dash") > .5f)
+		{
+			if(!onDashCooldown && releasedDashTrigger)
+			{
+				Dash();
+				StartCoroutine(CooldownDash());
+			}
+		}
+		else
+		{
+			releasedDashTrigger = true;
+		}
+
+	}
+	void Dash()
+	{
+
+	}
+	IEnumerator CooldownDash()
+	{
+		onDashCooldown = true;
+		yield return new WaitForSeconds(cooldownDash);
+		onDashCooldown = false;
+	}
+
+
+
 	void ShootBullet()
 	{
 		GameObject bullet = Instantiate(bulletPrefab, cannonShootPosition.position, Quaternion.identity);
-		bullet.GetComponent<Bullet>().InitialiseBullet(playerID,baseTr.forward,bulletSpeed);
+		bullet.GetComponent<Bullet>().InitialiseBullet(playerID,baseTr.forward,bulletSpeed,damage);
+	}
+	#endregion
+
+	void OnTriggerEnter(Collider col)
+	{
+		if(col.CompareTag("Bullet"))
+		{
+			HitByBullet(col.GetComponent<Bullet>());
+		}
 	}
 
+	#region Bullet
+	void HitByBullet(Bullet bullet)
+	{
+		if(bullet.playerID != playerID)
+		{
+			//knockback
+			rb.AddForce((bullet.transform.position - tr.position) * knockbackMagnitude);
+			Damaged(bullet);
+		
+			Stunned();
+			LooseWater();
+		}
+	}
+	void Damaged(Bullet bullet)
+	{
+		waterLevel -= bullet.damage;
+		if(waterLevel <= 0)
+		{
+			DeathPlayer();
+		}
+	}
+	void Stunned()
+	{
+
+	}
+	void LooseWater()
+	{
+
+	}
+	void DeathPlayer()
+	{
+
+	}
+	#endregion
 }

@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	public static GameManager instance;
+	void Awake()
+	{
+		instance = this;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	public void SpawnWater(Vector3 fromPosition, Vector3 toPosition)
+	{
+
 	}
 }

@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
+	public int playerID;
+	public int damage;
+
 	Transform tr;
 	float speed;
 
-	public void InitialiseBullet(int playerID, Vector3 direction, float startSpeed)
+	public void InitialiseBullet(int _playerID, Vector3 direction, float _speed, int _damage)
 	{
 		tr = GetComponent<Transform>();
 
 		tr.LookAt(tr.position + direction);
-		speed = startSpeed;
+		speed = _speed;
+		playerID = _playerID;
+		damage = _damage;
 	}
 
 	void Update()
